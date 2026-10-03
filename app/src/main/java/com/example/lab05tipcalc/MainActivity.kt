@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.lab05tipcalc.ui.theme.Lab05TipCalcTheme
@@ -64,7 +65,6 @@ fun calculateTotal(orderAmount: Double, tip: Double, discount: Double): Double {
 }
 
 
-
 @Composable
 fun TipScreen(
     snackbarHostState: SnackbarHostState,
@@ -78,7 +78,7 @@ fun TipScreen(
 
     val scope = rememberCoroutineScope()
 
-
+    // Автоматический выбор радиокнопки и расчёт скидки при изменении количества блюд
     LaunchedEffect(dishCountText) {
         val dishCount = dishCountText.trim().toIntOrNull()
         if (dishCount != null && dishCount > 0) {
@@ -190,11 +190,41 @@ fun TipScreen(
 
         Button(
             onClick = {
+                val orderAmount = orderAmountText.trim().toDoubleOrNull()
+                val dishCount = dishCountText.trim().toIntOrNull()
 
+                if (orderAmount == null) {
+                    resultText = "Ошибка: введите корректную сумму заказа"
+                } else if (dishCount == null || dishCount <= 0) {
+                    resultText = "Ошибка: введите корректное количество блюд"
+                } else {
+                    val tip = calculateTip(orderAmount, tipPercent)
+                    val discountPercent = calculateDiscountPercent(dishCount)
+                    val discount = calculateDiscountAmount(orderAmount, discountPercent)
+                    val total = calculateTotal(orderAmount, tip, discount)
+                    resultText = "Итого: $total"
+                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Итого", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun TipScreenPreview() {
+    Lab05TipCalcTheme {
+        val snackbarHostState = remember { SnackbarHostState() }
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        ) { innerPadding ->
+            TipScreen(
+                snackbarHostState = snackbarHostState,
+                modifier = Modifier.padding(innerPadding)
+            )
         }
     }
 }
