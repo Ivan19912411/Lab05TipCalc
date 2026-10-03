@@ -43,10 +43,21 @@ class MainActivity : ComponentActivity() {
 }
 
 
+
+/**
+ * Сумма чаевых = сумма заказа * процент чаевых / 100
+ */
 fun calculateTip(orderAmount: Double, tipPercent: Float): Double {
     return orderAmount * tipPercent / 100.0
 }
 
+/**
+ * Определяет процент скидки по количеству блюд:
+ * 1-2 блюда -> 3%
+ * 3-5 блюд -> 5%
+ * 6-10 блюд -> 7%
+ * более 10 -> 10%
+ */
 fun calculateDiscountPercent(dishCount: Int): Int {
     return when {
         dishCount <= 2 -> 3
@@ -56,14 +67,21 @@ fun calculateDiscountPercent(dishCount: Int): Int {
     }
 }
 
+/**
+ * Сумма скидки = сумма заказа * процент скидки / 100
+ */
 fun calculateDiscountAmount(orderAmount: Double, discountPercent: Int): Double {
     return orderAmount * discountPercent / 100.0
 }
 
+/**
+ * Итоговая сумма = сумма заказа + чаевые - скидка
+ */
 fun calculateTotal(orderAmount: Double, tip: Double, discount: Double): Double {
     return orderAmount + tip - discount
 }
 
+//
 
 @Composable
 fun TipScreen(
@@ -78,7 +96,7 @@ fun TipScreen(
 
     val scope = rememberCoroutineScope()
 
-    // Автоматический выбор радиокнопки и расчёт скидки при изменении количества блюд
+
     LaunchedEffect(dishCountText) {
         val dishCount = dishCountText.trim().toIntOrNull()
         if (dishCount != null && dishCount > 0) {
@@ -97,6 +115,7 @@ fun TipScreen(
             .padding(16.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
+
 
         Text(text = "Сумма заказа:", fontSize = 16.sp)
         Spacer(modifier = Modifier.height(4.dp))
@@ -168,7 +187,7 @@ fun TipScreen(
                             selected = selectedDiscountPercent == percent,
                             enabled = false,
                             role = Role.RadioButton,
-                            onClick = null
+                            onClick = { }
                         )
                     )
                     Text(text = "$percent%", fontSize = 14.sp)
