@@ -42,7 +42,6 @@ class MainActivity : ComponentActivity() {
 }
 
 
-
 fun calculateTip(orderAmount: Double, tipPercent: Float): Double {
     return orderAmount * tipPercent / 100.0
 }
@@ -65,6 +64,7 @@ fun calculateTotal(orderAmount: Double, tip: Double, discount: Double): Double {
 }
 
 
+
 @Composable
 fun TipScreen(
     snackbarHostState: SnackbarHostState,
@@ -77,6 +77,19 @@ fun TipScreen(
     var resultText by remember { mutableStateOf("") }
 
     val scope = rememberCoroutineScope()
+
+
+    LaunchedEffect(dishCountText) {
+        val dishCount = dishCountText.trim().toIntOrNull()
+        if (dishCount != null && dishCount > 0) {
+            selectedDiscountPercent = calculateDiscountPercent(dishCount)
+            val orderAmount = orderAmountText.trim().toDoubleOrNull() ?: 0.0
+            val discount = calculateDiscountAmount(orderAmount, selectedDiscountPercent)
+            resultText = "Скидка: $discount"
+        } else {
+            resultText = ""
+        }
+    }
 
     Column(
         modifier = modifier
